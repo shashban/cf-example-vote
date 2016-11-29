@@ -17,32 +17,14 @@ steps:
     tag: ${{CF_BRANCH}}
 
 
-  integration-tests-step:
-    type: composition
-    #location of the compostion on the filesystem of the cloned image
-    composition: './cf-compositions/voting-app-full.yml'
-    #run integration only when pushing to master
+  deploy to ecs:
+    image: codefresh/cf-deploy-ecs
+    commands:
+      - cfecs-update --image-name containers101/cf-example-vote --image-tag ${{CF_BRANCH}} eu-west-1 vote-app vote-srv
+    environment:
+      - AWS_ACCESS_KEY_ID=${{AWS_ACCESS_KEY_ID}}
+      - AWS_SECRET_ACCESS_KEY=${{AWS_SECRET_ACCESS_KEY}}
     when:
       branch:
         only:
-          - master #can also be regex
-    composition-candidates:
-    #this will be the image that we will test
-      integ-test:
-        image: containers101/cf-example-tests:master
-        command: ./tests.sh
-    composition-variables:
-      - VOTING_OPTION_A=${{OPTION_A}}
-      - VOTING_OPTION_B=${{OPTION_B}}
-
-    deploy to ecs:
-      image: codefresh/cf-deploy-ecs
-      commands:
-        - cfecs-update --image-name containers101/cf-example-vote --image-tag ${{CF_BRANCH}} eu-west-1 vote-app vote-srv
-      environment:
-        - AWS_ACCESS_KEY_ID=${{AWS_ACCESS_KEY_ID}}
-        - AWS_SECRET_ACCESS_KEY=${{AWS_SECRET_ACCESS_KEY}}
-      when:
-        branch:
-          only:
-            - master
+          - master
