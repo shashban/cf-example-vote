@@ -29,10 +29,3 @@ variables:
 steps:
 - script: docker build -f Dockerfile -t $(ACR.ImageName) .
   displayName: 'docker build'
-- task: Docker@1
-    displayName: 'Push an image'
-    inputs:
-      azureSubscriptionEndpoint: '$(Azure.ServiceConnectionId)'
-      azureContainerRegistry: '$(ACR.FullName)'
-      imageName: '$(ACR.ImageName)'
-      command: push
