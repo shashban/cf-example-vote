@@ -51,7 +51,8 @@ stages:
       displayName: Create resources
       condition: and(succeeded(), eq(variables['Azure.CreateResources'], 'true'))
 
-      pool: ProdPool
+      pool:
+        vmImage: 'Ubuntu-16.04'
 
       steps:
       - task: AzureResourceGroupDeployment@2
@@ -70,7 +71,9 @@ stages:
       dependsOn: CreateResources
       condition: or(succeeded(), ne(variables['Azure.CreateResources'], 'true'))
 
-      pool: ProdPool
+      pool:
+        vmImage: 'Ubuntu-16.04'
+
 
       steps:
       - task: Docker@1
