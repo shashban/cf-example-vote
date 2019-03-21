@@ -25,9 +25,12 @@ variables:
 
   ACR.ImageName: '$(ACR.Name):$(Build.BuildId)'
   ACR.FullName: '$(ACR.Name).azurecr.io'
+  ACR.ImageTag: '$(ACR.FullName)/$(ACR.ImageName)'
   
 steps:
 - script: docker build -f Dockerfile -t $(ACR.ImageName) .
+  displayName: 'docker build'
+- script: docker tag $(ACR.ImageName) $(ACR.ImageTag) .
   displayName: 'docker build'
 - task: Docker@1
   displayName: 'push image'
