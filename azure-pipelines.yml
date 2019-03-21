@@ -51,7 +51,7 @@ stages:
       displayName: Create resources
       condition: and(succeeded(), eq(variables['Azure.CreateResources'], 'true'))
 
-      pool: Default
+      pool: ProdPool
 
       steps:
       - task: AzureResourceGroupDeployment@2
@@ -70,7 +70,7 @@ stages:
       dependsOn: CreateResources
       condition: or(succeeded(), ne(variables['Azure.CreateResources'], 'true'))
 
-      pool: Default
+      pool: ProdPool
 
       steps:
       - task: Docker@1
@@ -97,7 +97,7 @@ stages:
     - job: DeployApp
       displayName: Deploy   
 
-      pool: Default
+      pool: ProdPool
       
       steps:
       - bash: |
