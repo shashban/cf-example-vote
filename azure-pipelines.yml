@@ -51,8 +51,8 @@ stages:
       displayName: Create resources
       condition: and(succeeded(), eq(variables['Azure.CreateResources'], 'true'))
 
-      pool:
-        vmImage: 'Ubuntu-16.04'
+      pool: ProdPool
+
 
       steps:
       - task: AzureResourceGroupDeployment@2
@@ -71,82 +71,25 @@ stages:
       dependsOn: CreateResources
       condition: or(succeeded(), ne(variables['Azure.CreateResources'], 'true'))
 
-      pool:
-        vmImage: 'Ubuntu-16.04'
-
-
-      steps:
-      - task: Docker@1
-        displayName: 'Build an image'
-        inputs:
-          azureSubscriptionEndpoint: '$(Azure.ServiceConnectionId)'
-          azureContainerRegistry: '$(ACR.FullName)'
-          imageName: '$(ACR.ImageName)'
-          command: build
-          dockerFile: '**/Dockerfile'
-
-      - task: Docker@1
-        displayName: 'Push an image'
-        inputs:
-          azureSubscriptionEndpoint: '$(Azure.ServiceConnectionId)'
-          azureContainerRegistry: '$(ACR.FullName)'
-          imageName: '$(ACR.ImageName)'
-          command: push
-
-  - stage: Deploy
-    dependsOn: Build
-    condition: succeeded()
-    jobs:
-    - job: DeployApp
-      displayName: Deploy   
-
       pool: ProdPool
-      
       steps:
-      - bash: |
-          if [ -f $(AKS.KubeDeploymentYaml) ]; then
-            echo "##vso[task.setvariable variable=AKS.KubeDeploymentYamlExists;]true"
-          else
-            echo "##vso[task.setvariable variable=AKS.KubeDeploymentYamlExists;]false"
-          fi
-        displayName: 'Check kubernetes deployment yaml exists'
-
-      - bash: |  
-          echo "apiVersion : apps/v1beta1
-          kind: Deployment
-          metadata:
-            name: $(ACR.RepositoryName)
-          spec:
-            replicas: 1
-            template:
-              metadata:
-                labels:
-                  app: $(ACR.RepositoryName)
-              spec:
-                containers:
-                - name: $(ACR.RepositoryName)
-                  image: $(ACR.FullName)/$(ACR.ImageName)
-                  ports:
-                  - containerPort: $(AKS.DeploymentPort)
-          ---
-          apiVersion: v1
-          kind: Service
-          metadata:
-            name: $(ACR.RepositoryName)
-          spec:
-            type: LoadBalancer
-            ports:
-            - port: $(AKS.DeploymentPort)
-            selector:
-              app: $(ACR.RepositoryName)" > $(AKS.KubeDeploymentYaml)
-        displayName: 'Generate kubernetes deployment yaml'
-        condition: and(succeeded(), eq(variables['AKS.KubeDeploymentYamlExists'], 'False'))
-
-      - task: Kubernetes@1
-        displayName: 'kubectl apply'
-        inputs:
-          azureSubscriptionEndpoint: '$(Azure.ServiceConnectionId)'
-          azureResourceGroup: '$(Azure.ResourceGroupName)'
-          kubernetesCluster: '$(AKS.ClusterName)'
-          arguments: '-f $(AKS.KubeDeploymentYaml)'
-          command: 'apply'
+      - script: Echo "Build and Push image"
+  - stage: test
+    dependsOn: Build
+    jobs:
+      - deployment: deployWeb
+        environment: smarthotel360-prod.abc-fe88
+        pool: prodpool
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - script: echo kubectl get pods
+                displayName: 'Getting pod details'
+              - task: Kubernetes@1
+                displayName: 'kubectl get'
+                inputs:
+                  namespace: 'abc-fe88'
+                  command: get
+                  arguments: pods
+    
