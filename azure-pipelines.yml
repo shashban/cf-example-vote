@@ -17,7 +17,7 @@ variables:
   Azure.ResourceGroupName: 'shashbanpipelinesdotnetcore'
 
   # Update Azure.ServiceConnectionId value with AzureRm service endpoint.
-  Azure.ServiceConnectionId: '741d683b-19ed-418d-9cb6-2c9312326335'
+  Azure.ServiceConnectionId: '3c886bd3-ba07-4bc5-b4b5-2e293b71b312'
 
   # Update Azure.Location value with Azure Location.
   Azure.Location: 'eastus'
@@ -51,8 +51,7 @@ stages:
       displayName: Create resources
       condition: and(succeeded(), eq(variables['Azure.CreateResources'], 'true'))
 
-      pool:
-        vmImage: 'Ubuntu-16.04'
+      pool: Default
 
       steps:
       - task: AzureResourceGroupDeployment@2
@@ -71,8 +70,7 @@ stages:
       dependsOn: CreateResources
       condition: or(succeeded(), ne(variables['Azure.CreateResources'], 'true'))
 
-      pool:
-        vmImage: 'Ubuntu-16.04'
+      pool: Default
 
       steps:
       - task: Docker@1
@@ -99,9 +97,8 @@ stages:
     - job: DeployApp
       displayName: Deploy   
 
-      pool:
-        vmImage: 'Ubuntu-16.04'
-
+      pool: Default
+      
       steps:
       - bash: |
           if [ -f $(AKS.KubeDeploymentYaml) ]; then
