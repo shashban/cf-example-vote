@@ -30,8 +30,9 @@ steps:
 - script: docker build -f Dockerfile -t $(ACR.ImageName) .
   displayName: 'docker build'
 - task: Docker@1
+  displayName: 'push image'
   inputs:
     azureSubscriptionEndpoint: $(Azure.ServiceConnection)
     azureContainerRegistry: $(ACR.FullName)
     imageName: $(ACR.ImageName)
-    command: 'Build an image'
+    command: push
