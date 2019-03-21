@@ -1,0 +1,81 @@
+# Docker image and Azure Container Registry
+# Build a Docker image and push it to an Azure Container Registry.
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  # ========================================================================
+  #                          Mandatory variables 
+  # ========================================================================
+
+ # Update Azure.ResourceGroupName value with Azure resource group name.
+  Azure.ResourceGroupName: 'shashbanpipelinesdotnetcore'
+
+  # Update Azure.ServiceConnectionId value with AzureRm service endpoint.
+  Azure.ServiceConnectionId: '741d683b-19ed-418d-9cb6-2c9312326335'
+
+  # Update Azure.Location value with Azure Location.
+  Azure.Location: 'eastus'
+
+  # Update ACR.Name value with ACR name. Please note ACR names should be all lower-case and alphanumeric only.
+  ACR.Name: 'shashbanpipelinesdotnetcoree0c9'
+
+  # ========================================================================
+  #                           Optional variables 
+  # ========================================================================
+
+  ACR.ImageName: '$(ACR.Name):$(Build.BuildId)'
+  ACR.FullName: '$(ACR.Name).azurecr.io'
+  Azure.CreateResources: 'false' # Update Azure.CreateResources to false if you have already created resources like resource group and azure container registry.
+  System.Debug: 'false'
+
+jobs:
+
+- job: CreateResources
+  displayName: Create required resources
+  condition: and(succeeded(), eq(variables['Azure.CreateResources'], 'true'))
+
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+  - task: AzureResourceGroupDeployment@2
+    displayName: 'Azure Deployment:Create Azure Container Registry'
+    inputs:
+      azureSubscription: '$(Azure.ServiceConnectionId)'
+      resourceGroupName: '$(Azure.ResourceGroupName)'
+      location: '$(Azure.Location)'
+      templateLocation: 'URL of the file'
+      csmFileLink: 'https://raw.githubusercontent.com/Microsoft/azure-pipelines-yaml/master/templates/resources/arm/acr.json'
+      overrideParameters: '-registryName "$(ACR.Name)" -registryLocation "$(Azure.Location)"'
+
+- job: BuildImage
+  displayName: Build
+  dependsOn: CreateResources
+  condition: or(succeeded(), ne(variables['Azure.CreateResources'], 'true'))
+
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+  - task: Docker@1
+    displayName: 'Build an image'
+    inputs:
+      azureSubscriptionEndpoint: '$(Azure.ServiceConnectionId)'
+      azureContainerRegistry: '$(ACR.FullName)'
+      imageName: '$(ACR.ImageName)'
+      command: build
+      dockerFile: '**/Dockerfile'
+
+  - task: Docker@1
+    displayName: 'Push an image'
+    inputs:
+      azureSubscriptionEndpoint: '$(Azure.ServiceConnectionId)'
+      azureContainerRegistry: '$(ACR.FullName)'
+      imageName: '$(ACR.ImageName)'
+      command: push
