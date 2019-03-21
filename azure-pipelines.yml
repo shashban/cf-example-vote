@@ -10,8 +10,29 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 variables:
-  imageName: 'shashbanexamplevote:$(build.buildId)'
+  # ========================================================================
+  #                          Mandatory variables 
+  # ========================================================================
 
+  # Update Azure.ServiceConnectionId value with AzureRm service endpoint.
+  Azure.ServiceConnectionId: '741d683b-19ed-418d-9cb6-2c9312326335'
+  # Update ACR.Name value with ACR name. Please note ACR names should be all lower-case and alphanumeric only.
+  ACR.Name: 'shashbanpipelinesdotnetcoree0c9'
+
+  # ========================================================================
+  #                           Optional variables 
+  # ========================================================================
+
+  ACR.ImageName: '$(ACR.Name):$(Build.BuildId)'
+  ACR.FullName: '$(ACR.Name).azurecr.io'
+  
 steps:
-- script: docker build -f Dockerfile -t $(imageName) .
+- script: docker build -f Dockerfile -t $(ACR.ImageName) .
   displayName: 'docker build'
+- task: Docker@1
+    displayName: 'Push an image'
+    inputs:
+      azureSubscriptionEndpoint: '$(Azure.ServiceConnectionId)'
+      azureContainerRegistry: '$(ACR.FullName)'
+      imageName: '$(ACR.ImageName)'
+      command: push
