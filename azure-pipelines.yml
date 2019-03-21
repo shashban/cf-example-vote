@@ -30,8 +30,8 @@ variables:
 steps:
 - script: docker build -f Dockerfile -t $(ACR.ImageName) .
   displayName: 'docker build'
-- script: docker tag $(ACR.ImageName) $(ACR.ImageTag) .
-  displayName: 'docker build'
+- script: docker tag $(ACR.ImageName) $(ACR.ImageTag)
+  displayName: 'docker tag'
 - task: Docker@1
   displayName: 'push image'
   inputs:
