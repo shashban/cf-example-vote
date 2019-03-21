@@ -89,6 +89,8 @@ stages:
               - task: Kubernetes@1
                 displayName: 'kubectl get'
                 inputs:
+                  connectionType: 'Kubernetes Service Connection'
+                  kubernetesServiceEndpoint: ajAksCluster-abc-fe88-Prod
                   namespace: 'abc-fe88'
                   command: get
                   arguments: pods
