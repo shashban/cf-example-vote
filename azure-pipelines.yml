@@ -47,7 +47,6 @@ variables:
 stages:
   - stage: Build
     jobs:
-
     - job: CreateResources
       displayName: Create resources
       condition: and(succeeded(), eq(variables['Azure.CreateResources'], 'true'))
@@ -96,57 +95,58 @@ stages:
   - stage: Deploy
     dependsOn: Build
     condition: succeeded()
-  - job: DeployApp
-    displayName: Deploy   
+    jobs:
+    - job: DeployApp
+      displayName: Deploy   
 
-    pool:
-      vmImage: 'Ubuntu-16.04'
+      pool:
+        vmImage: 'Ubuntu-16.04'
 
-    steps:
-    - bash: |
-        if [ -f $(AKS.KubeDeploymentYaml) ]; then
-          echo "##vso[task.setvariable variable=AKS.KubeDeploymentYamlExists;]true"
-        else
-          echo "##vso[task.setvariable variable=AKS.KubeDeploymentYamlExists;]false"
-        fi
-      displayName: 'Check kubernetes deployment yaml exists'
+      steps:
+      - bash: |
+          if [ -f $(AKS.KubeDeploymentYaml) ]; then
+            echo "##vso[task.setvariable variable=AKS.KubeDeploymentYamlExists;]true"
+          else
+            echo "##vso[task.setvariable variable=AKS.KubeDeploymentYamlExists;]false"
+          fi
+        displayName: 'Check kubernetes deployment yaml exists'
 
-    - bash: |  
-        echo "apiVersion : apps/v1beta1
-        kind: Deployment
-        metadata:
-          name: $(ACR.RepositoryName)
-        spec:
-          replicas: 1
-          template:
-            metadata:
-              labels:
-                app: $(ACR.RepositoryName)
-            spec:
-              containers:
-              - name: $(ACR.RepositoryName)
-                image: $(ACR.FullName)/$(ACR.ImageName)
-                ports:
-                - containerPort: $(AKS.DeploymentPort)
-        ---
-        apiVersion: v1
-        kind: Service
-        metadata:
-          name: $(ACR.RepositoryName)
-        spec:
-          type: LoadBalancer
-          ports:
-          - port: $(AKS.DeploymentPort)
-          selector:
-            app: $(ACR.RepositoryName)" > $(AKS.KubeDeploymentYaml)
-      displayName: 'Generate kubernetes deployment yaml'
-      condition: and(succeeded(), eq(variables['AKS.KubeDeploymentYamlExists'], 'False'))
+      - bash: |  
+          echo "apiVersion : apps/v1beta1
+          kind: Deployment
+          metadata:
+            name: $(ACR.RepositoryName)
+          spec:
+            replicas: 1
+            template:
+              metadata:
+                labels:
+                  app: $(ACR.RepositoryName)
+              spec:
+                containers:
+                - name: $(ACR.RepositoryName)
+                  image: $(ACR.FullName)/$(ACR.ImageName)
+                  ports:
+                  - containerPort: $(AKS.DeploymentPort)
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: $(ACR.RepositoryName)
+          spec:
+            type: LoadBalancer
+            ports:
+            - port: $(AKS.DeploymentPort)
+            selector:
+              app: $(ACR.RepositoryName)" > $(AKS.KubeDeploymentYaml)
+        displayName: 'Generate kubernetes deployment yaml'
+        condition: and(succeeded(), eq(variables['AKS.KubeDeploymentYamlExists'], 'False'))
 
-    - task: Kubernetes@1
-      displayName: 'kubectl apply'
-      inputs:
-        azureSubscriptionEndpoint: '$(Azure.ServiceConnectionId)'
-        azureResourceGroup: '$(Azure.ResourceGroupName)'
-        kubernetesCluster: '$(AKS.ClusterName)'
-        arguments: '-f $(AKS.KubeDeploymentYaml)'
-        command: 'apply'
+      - task: Kubernetes@1
+        displayName: 'kubectl apply'
+        inputs:
+          azureSubscriptionEndpoint: '$(Azure.ServiceConnectionId)'
+          azureResourceGroup: '$(Azure.ResourceGroupName)'
+          kubernetesCluster: '$(AKS.ClusterName)'
+          arguments: '-f $(AKS.KubeDeploymentYaml)'
+          command: 'apply'
