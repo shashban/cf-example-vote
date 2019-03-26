@@ -22,12 +22,12 @@ variables:
   # Update Kubernetes serviceconnectionId for Dev environment
   Dev.Kubernetes.ServiceConnectionId: '8f8dd969-8322-4e32-9f9d-962dcb985f82'
 
-  VariableGroupName: ''
+  VariableGroupName: 'Test'
 
 stages:
   - stage: Build
     variables:
-    - group: $(VariableGroupName)
+    - group: 'ashok'
     jobs:    
     - job: BuildImage
       displayName: Build
