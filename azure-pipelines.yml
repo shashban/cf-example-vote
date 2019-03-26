@@ -33,7 +33,7 @@ stages:
       displayName: Build
       pool: Default
       steps:
-      - script: Echo "Build and Push image"
+      - script: Echo "Build and Push image $(name)"
   - stage: Dev
     dependsOn: Build
     jobs:
