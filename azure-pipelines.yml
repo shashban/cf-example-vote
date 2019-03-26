@@ -31,7 +31,7 @@ stages:
     dependsOn: Build
     jobs:
       - deployment: deployDev
-        environment: 'SmartHotel360-dev'
+        environment: 'SmartHotel360-dev.abc-fe88'
         pool: Default
         strategy:
           runOnce:
@@ -42,7 +42,7 @@ stages:
               - task: Kubernetes@1
                 displayName: 'kubectl get'
                 inputs:
-                  namespace: '$(Dev.Namespace)'
+                  #namespace: '$(Dev.Namespace)'
                   command: get
                   arguments: pods
       - job: test
