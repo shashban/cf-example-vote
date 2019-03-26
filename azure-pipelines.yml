@@ -1,0 +1,62 @@
+# Docker image, Azure Container Registry, and Azure Kubernetes Service
+# Build a Docker image, push it to an Azure Container Registry, and deploy it to Azure Kubernetes Service.
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  # ========================================================================
+  #                          Mandatory variables 
+  # ========================================================================
+
+  # Update with pre-created dev environment name
+  Dev.EnvironmentName: 'SmartHotel360-dev'
+
+  # Update the namespace in the dev environment
+  Dev.Namespace: 'abc-fe88'
+
+  # Update Kubernetes serviceconnectionId for Dev environment
+  Dev.Kubernetes.ServiceConnectionId: '8f8dd969-8322-4e32-9f9d-962dcb985f82'
+
+stages:
+  - stage: Build
+    jobs:    
+    - job: BuildImage
+      displayName: Build
+      pool: Default
+      steps:
+      - script: Echo "Build and Push image"
+  - stage: Dev
+    dependsOn: Build
+    jobs:
+      - deployment: deployDev
+        environment: '$(DEV.FullResourceName)'
+        pool: Default
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - script: echo kubectl get pods
+                displayName: 'Getting pod details'
+              - task: Kubernetes@1
+                displayName: 'kubectl get'
+                inputs:
+                  namespace: '$(Dev.Namespace)'
+                  command: get
+                  arguments: pods
+      - job: test
+        displayName: Test        
+        pool: Default
+        steps:
+          - task: Kubernetes@1
+            displayName: 'kubectl get'
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: '$(Dev.Kubernetes.ServiceConnectionId)'
+              namespace: '$(Dev.Namespace)'
+              command: get
+              arguments: pods
