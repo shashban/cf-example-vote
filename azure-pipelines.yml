@@ -13,9 +13,6 @@ variables:
   #                          Mandatory variables 
   # ========================================================================
 
-  # Update with pre-created dev environment name
-  Dev.EnvironmentName: 'SmartHotel360-dev'
-
   # Update the namespace in the dev environment
   Dev.Namespace: 'abc-fe88'
 
@@ -34,7 +31,7 @@ stages:
     dependsOn: Build
     jobs:
       - deployment: deployDev
-        environment: '$(Dev.EnvironmentName)'
+        environment: 'SmartHotel360-dev'
         pool: Default
         strategy:
           runOnce:
