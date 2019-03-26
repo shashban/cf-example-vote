@@ -33,7 +33,7 @@ stages:
       displayName: Build
       pool: Default
       steps:
-      - script: sleep 20
+      - powershell: sleep 20
       - script: Echo "Build and Push image $(name)"
     - job: BuildImage2
       displayName: Build2
