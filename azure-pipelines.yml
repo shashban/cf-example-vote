@@ -13,14 +13,17 @@ variables:
   #                          Mandatory variables 
   # ========================================================================
 
- # Update the dev environment resource
-  Dev.EnvironmentResource: 'SmartHotel360-dev.abc-fe88'
-
   # Update the namespace in the dev environment
   Dev.Namespace: 'abc-fe88'
 
   # Update Kubernetes serviceconnectionId for Dev environment
   Dev.Kubernetes.ServiceConnectionId: '8f8dd969-8322-4e32-9f9d-962dcb985f82'
+
+  # Update the namespace in the Prod environment
+  Prod.Namespace: 'default'
+
+  # Update Kubernetes serviceconnectionId for Prod environment
+  Prod.Kubernetes.ServiceConnectionId: 'c8c547b8-fd0c-40db-85b2-6c37d3d14e2b'
 
   VariableGroupName: 'Test'
 
@@ -68,5 +71,35 @@ stages:
               connectionType: 'Kubernetes Service Connection'
               kubernetesServiceEndpoint: '$(Dev.Kubernetes.ServiceConnectionId)'
               namespace: '$(Dev.Namespace)'
+              command: get
+              arguments: pods
+  - stage: Prod
+    dependsOn: Dev
+    jobs:
+      - deployment: deployProd
+        environment: 'SmartHotel360-Prod.default'
+        pool: Default
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - script: echo kubectl get pods
+                displayName: 'Getting pod details'
+              - task: Kubernetes@1
+                displayName: 'kubectl get'
+                inputs:
+                  namespace: '$(Prod.Namespace)'
+                  command: get
+                  arguments: pods
+      - job: test
+        displayName: Test        
+        pool: Default
+        steps:
+          - task: Kubernetes@1
+            displayName: 'kubectl get'
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: '$(Prod.Kubernetes.ServiceConnectionId)'
+              namespace: '$(Prod.Namespace)'
               command: get
               arguments: pods
