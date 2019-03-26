@@ -34,7 +34,7 @@ stages:
     dependsOn: Build
     jobs:
       - deployment: deployDev
-        environment: '$(Dev.EnvironmentResource)'
+        environment: 'SmartHotel360-dev.abc-fe88'
         pool: Default
         strategy:
           runOnce:
