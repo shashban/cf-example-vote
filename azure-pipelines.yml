@@ -42,7 +42,7 @@ stages:
       steps:
       - script: Echo "Build and Push image $(DevEnvironmentResourceName)"
   - stage: Prod
-    dependsOn: Dev
+    #dependsOn: Dev
     jobs:
     #  - deployment: deployProd
     #    environment: 'SmartHotel360-Prod.default'
