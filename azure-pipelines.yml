@@ -35,7 +35,14 @@ variables:
   DevEnvironmentResourceName: '$(Dev.EnvironmentName).$(Dev.Namespace)'
 
 stages:
-  - stage: Prod
+  - stage: A
+    jobs:
+      - job: test
+        displayName: Test        
+        pool: Default
+        steps:
+          - script: echo abc
+  - stage: B
     jobs:
       - job: test
         displayName: Test        
