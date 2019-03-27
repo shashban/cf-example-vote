@@ -41,11 +41,4 @@ stages:
         displayName: Test        
         pool: Default
         steps:
-          - task: Kubernetes@1
-            displayName: 'kubectl get'
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceEndpoint: '$(Prod.Kubernetes.ServiceConnectionId)'
-              namespace: '$(Prod.Namespace)'
-              command: get
-              arguments: pods
+          - powershell: Write-Host 'abc'
