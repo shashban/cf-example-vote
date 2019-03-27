@@ -41,41 +41,6 @@ stages:
       pool: Default
       steps:
       - script: Echo "Build and Push image $(DevEnvironmentResourceName)"
-    - job: BuildImage2
-      displayName: Build2
-      pool: Default
-      steps:
-      - script: Echo "Build and Push image $(name)"  
-  - stage: Dev
-    dependsOn: Build
-    jobs:
-      - deployment: deployDev
-        environment: 'SmartHotel360-dev.abc-fe88'
-        pool: Default
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-              - script: echo kubectl get pods
-                displayName: 'Getting pod details'
-              - task: Kubernetes@1
-                displayName: 'kubectl get'
-                inputs:
-                  namespace: '$(Dev.Namespace)'
-                  command: get
-                  arguments: pods
-      - job: test
-        displayName: Test        
-        pool: Default
-        steps:
-          - task: Kubernetes@1
-            displayName: 'kubectl get'
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceEndpoint: '$(Dev.Kubernetes.ServiceConnectionId)'
-              namespace: '$(Dev.Namespace)'
-              command: get
-              arguments: pods
   - stage: Prod
     dependsOn: Dev
     jobs:
