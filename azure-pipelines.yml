@@ -22,6 +22,9 @@ variables:
   # Update Kubernetes serviceconnectionId for Dev environment
   Dev.Kubernetes.ServiceConnectionId: '8f8dd969-8322-4e32-9f9d-962dcb985f82'
 
+  # Update the name of the dev environment
+  Prod.EnvironmentName: 'SmartHotel360-prod'
+
   # Update the namespace in the Prod environment
   Prod.Namespace: 'default'
 
@@ -40,25 +43,25 @@ stages:
       displayName: Build
       pool: Default
       steps:
-      - script: Echo "Build and Push image $(DevEnvironmentResourceName)"
-  - stage: Prod
-    #dependsOn: Dev
+      - script: Echo "Build and Push image $(DevEnvironmentResourceName)" 
+  - stage: Dev
+    dependsOn: Build
     jobs:
-    #  - deployment: deployProd
-    #    environment: 'SmartHotel360-Prod.default'
-    #    pool: Default
-    #    strategy:
-    #      runOnce:
-    #        deploy:
-     #         steps:
-      #        - script: echo kubectl get pods
-       #         displayName: 'Getting pod details'
-        #      - task: Kubernetes@1
-         #       displayName: 'kubectl get'
-          #      inputs:
-           #       namespace: '$(Prod.Namespace)'
-            #      command: get
-             #     arguments: pods
+      - deployment: deployDev
+        environment: 'SmartHotel360-dev.abc-fe88'
+        pool: Default
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - script: echo kubectl get pods
+                displayName: 'Getting pod details'
+              - task: Kubernetes@1
+                displayName: 'kubectl get'
+                inputs:
+                  namespace: '$(Dev.Namespace)'
+                  command: get
+                  arguments: pods
       - job: test
         displayName: Test        
         pool: Default
@@ -67,7 +70,37 @@ stages:
             displayName: 'kubectl get'
             inputs:
               connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceEndpoint: 'ajAksCluster-default'
+              kubernetesServiceEndpoint: '$(Dev.Kubernetes.ServiceConnectionId)'
+              namespace: '$(Dev.Namespace)'
+              command: get
+              arguments: pods
+  - stage: Prod
+    dependsOn: Dev
+    jobs:
+      - deployment: deployProd
+        environment: 'SmartHotel360-Prod.default'
+        pool: Default
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - script: echo kubectl get pods
+                displayName: 'Getting pod details'
+              - task: Kubernetes@1
+                displayName: 'kubectl get'
+                inputs:
+                  namespace: '$(Prod.Namespace)'
+                  command: get
+                  arguments: pods
+      - job: test
+        displayName: Test        
+        pool: Default
+        steps:
+          - task: Kubernetes@1
+            displayName: 'kubectl get'
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: '$(Prod.Kubernetes.ServiceConnectionId)'
               namespace: '$(Prod.Namespace)'
               command: get
               arguments: pods
