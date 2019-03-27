@@ -35,63 +35,8 @@ variables:
   DevEnvironmentResourceName: '$(Dev.EnvironmentName).$(Dev.Namespace)'
 
 stages:
-  - stage: Build
-    variables:
-    - group: 'ashok'
-    jobs:    
-    - job: BuildImage
-      displayName: Build
-      pool: Default
-      steps:
-      - script: Echo "Build and Push image $(DevEnvironmentResourceName)" 
-  - stage: Dev
-    dependsOn: Build
-    jobs:
-      - deployment: deployDev
-        environment: 'SmartHotel360-dev.abc-fe88'
-        pool: Default
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-              - script: echo kubectl get pods
-                displayName: 'Getting pod details'
-              - task: Kubernetes@1
-                displayName: 'kubectl get'
-                inputs:
-                  namespace: '$(Dev.Namespace)'
-                  command: get
-                  arguments: pods
-      - job: test
-        displayName: Test        
-        pool: Default
-        steps:
-          - task: Kubernetes@1
-            displayName: 'kubectl get'
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceEndpoint: '$(Dev.Kubernetes.ServiceConnectionId)'
-              namespace: '$(Dev.Namespace)'
-              command: get
-              arguments: pods
   - stage: Prod
-    dependsOn: Dev
     jobs:
-      - deployment: deployProd
-        environment: 'SmartHotel360-Prod.default'
-        pool: Default
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-              - script: echo kubectl get pods
-                displayName: 'Getting pod details'
-              - task: Kubernetes@1
-                displayName: 'kubectl get'
-                inputs:
-                  namespace: '$(Prod.Namespace)'
-                  command: get
-                  arguments: pods
       - job: test
         displayName: Test        
         pool: Default
