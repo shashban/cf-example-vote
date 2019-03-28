@@ -1,1 +1,1 @@
-# cf-example-vote
+# example-vote
