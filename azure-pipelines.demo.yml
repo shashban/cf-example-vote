@@ -1,35 +1,9 @@
-# Docker image and Azure Container Registry
-# Build a Docker image and push it to an Azure Container Registry.
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
 - master
 
 resources:
 - repo: self
-
-variables:
-  # ========================================================================
-  #                          Mandatory variables 
-  # ========================================================================
-
-  # Update Azure.ServiceConnectionId value with AzureRm service endpoint.
-  Azure.ServiceConnectionId: '23c3248a-7c13-4577-942b-1d525af3df74'
-
-  # Update Azure.Location value with Azure Location.
-  Azure.Location: 'eastus'
-
-  # Update ACR.Name value with ACR name. Please note ACR names should be all lower-case and alphanumeric only.
-  ACR.Name: 'ronaiacr'
-
-  # ========================================================================
-  #                           Optional variables 
-  # ========================================================================
-
-  ACR.ImageName: '$(ACR.Name):$(Build.BuildId)'
-  ACR.FullName: '$(ACR.Name).azurecr.io'
-  ACR.ImageTag: '$(ACR.FullName)/$(ACR.ImageName)'
-  System.Debug: 'true'
 
 stages:
 - stage: Build
