@@ -49,3 +49,15 @@ stages:
               namespace: 'default'
               command: get
               arguments: pods
+  - job: test
+    displayName: Test        
+    pool: Default
+    steps:
+      - task: Kubernetes@1
+        displayName: 'kubectl get'
+        inputs:
+          connectionType: 'Kubernetes Service Connection'
+          kubernetesServiceEndpoint: 'ajAksCluster-default'
+          namespace: 'default'
+          command: get
+          arguments: pods
