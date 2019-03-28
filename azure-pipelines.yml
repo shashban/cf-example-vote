@@ -59,3 +59,20 @@ stages:
               namespace: 'abc-fe88'
               command: get
               arguments: pods
+- stage: DeployProd
+  jobs:
+  - deployment: deployProd
+    environment: 'examplevote-prod.default'
+    pool: Default
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo kubectl get pods
+            displayName: 'Getting pod details'
+          - task: Kubernetes@1
+            displayName: 'kubectl get'
+            inputs:
+              namespace: 'default'
+              command: get
+              arguments: pods
