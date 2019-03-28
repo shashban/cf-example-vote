@@ -1,0 +1,34 @@
+trigger:
+- master
+
+resources:
+- repo: self
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildImage
+    displayName: Build
+    pool: default
+    steps:
+    - script: echo 'building docker image'
+      displayName: 'docker build'
+    - script: echo 'tagging image'
+      displayName: 'docker tag'
+- stage: DeployDev
+  jobs:
+  - deployment: deployDev
+    environment: 'examplevote-dev.abc-fe88'
+    pool: Default
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo kubectl get pods
+            displayName: 'Getting pod details'
+          - task: Kubernetes@1
+            displayName: 'kubectl get'
+            inputs:
+              namespace: 'abc-fe88'
+              command: get
+              arguments: pods
