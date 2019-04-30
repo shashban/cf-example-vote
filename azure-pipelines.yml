@@ -20,7 +20,6 @@ stages:
       displayName: 'docker tag'
   - deployment: deployProd
     environment: 'emptyProd'
-    
     strategy:
       runOnce:
         deploy:
