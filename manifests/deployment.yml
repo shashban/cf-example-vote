@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: shashbanexamplevote 
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: shashbanexamplevote 
+    spec:
+      containers:
+        - name: shashbanexamplevote 
+          image: atulmakshelm.azurecr.io/shashbanexamplevote 
+          ports:
+          - containerPort: 80
