@@ -20,7 +20,7 @@ variables:
   # Kubernetes Namespace
   k8sNamespace: 'default'
   imagePullSecret: 'atulmakshelm538a-auth'
-
+  kuneconn: 'kodeAKS-default'
 
 stages:
 - stage: Build
@@ -28,7 +28,9 @@ stages:
   jobs:  
   - job: Build
     displayName: Build job
+    
     steps:
+    - checkout: none
     - script: echo HEllow wporls
 
 - stage: Deploy
@@ -36,7 +38,7 @@ stages:
   dependsOn: Build
   jobs:
   - deployment: deployDev
-    environment: 'shashbanexamplevote-1722'
+    environment: 'shashbanexamplevote'
     strategy:
       runOnce:
         deploy:
@@ -45,7 +47,7 @@ stages:
             displayName: Create imagePullSecret
             inputs:
               action: 'createSecret'
-              # kubernetesServiceConnection: 'kodeAKS-default'
+              kubernetesServiceConnection: $(kubeconn)
               namespace: 'default'
               secretType: 'dockerRegistry'
               secretName: 'secret'
