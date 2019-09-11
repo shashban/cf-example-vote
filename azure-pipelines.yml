@@ -20,7 +20,7 @@ variables:
   # Kubernetes Namespace
   k8sNamespace: 'default'
   imagePullSecret: 'atulmakshelm538a-auth'
-  kuneconn: 'kodeAKS-default'
+  kubeconn: 'kodeAKS-default'
 
 stages:
 - stage: Build
