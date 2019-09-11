@@ -29,7 +29,7 @@ stages:
   - job: Build
     displayName: Build job
     steps:
-    - script: HEllow wporls
+    - script: echo HEllow wporls
 
 - stage: Deploy
   displayName: Deploy stage
