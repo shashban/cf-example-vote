@@ -36,7 +36,7 @@ stages:
   dependsOn: Build
   jobs:
   - deployment: deployDev
-    environment: 'shashbanexamplevote-1722'
+    environment: 'shashbanexamplevote'
     strategy:
       runOnce:
         deploy:
