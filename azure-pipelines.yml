@@ -20,7 +20,8 @@ variables:
   # Kubernetes Namespace
   k8sNamespace: 'default'
   imagePullSecret: 'atulmakshelm538a-auth'
-  
+  kubeconn: 'kodeAKS-default'
+
 
 stages:
 - stage: Build
@@ -36,8 +37,7 @@ stages:
 - stage: Deploy
   displayName: Deploy stage
   dependsOn: Build
-  variables:
-    kubeconn: 'kodeAKS-default'
+  
   jobs:
   - deployment: deployDev
     environment: 'shashbanexamplevote-1722'
