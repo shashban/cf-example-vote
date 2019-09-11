@@ -35,15 +35,19 @@ stages:
   displayName: Deploy stage
   dependsOn: Build
   jobs:
-  - job: Deploy
-    displayName: Deploy job
-    steps:
-    - task: KubernetesManifest@0
-      displayName: Create imagePullSecret
-      inputs:
-        action: 'createSecret'
-        kubernetesServiceConnection: 'kodeAKS-default'
-        namespace: 'default'
-        secretType: 'dockerRegistry'
-        secretName: 'secret'
-        dockerRegistryEndpoint: 'atulmakshelm'
+  - deployment: deployDev
+    environment: 'shashbanexamplevote-1722'
+    pool: Default
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: KubernetesManifest@0
+            displayName: Create imagePullSecret
+            inputs:
+              action: 'createSecret'
+              kubernetesServiceConnection: 'kodeAKS-default'
+              namespace: 'default'
+              secretType: 'dockerRegistry'
+              secretName: 'secret'
+              dockerRegistryEndpoint: 'atulmakshelm'
