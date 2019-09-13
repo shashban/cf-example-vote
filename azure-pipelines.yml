@@ -22,7 +22,6 @@ variables:
   imagePullSecret: 'atulmakshelm538a-auth'
   kubeconn: 'kodeAKS-default'
 
-
 stages:
 - stage: Build
   displayName: Build stage
@@ -49,7 +48,7 @@ stages:
             displayName: Create imagePullSecret
             inputs:
               action: 'createSecret'
-              kubernetesServiceConnection: 'kodeAKS-default'
+              kubernetesServiceConnection: '$(kubeconn)'
               namespace: 'default'
               secretType: 'dockerRegistry'
               secretName: 'secret'
