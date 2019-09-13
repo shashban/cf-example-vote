@@ -49,7 +49,7 @@ stages:
             displayName: Create imagePullSecret
             inputs:
               action: 'createSecret'
-              kubernetesServiceConnection: $(kubeconn)
+              kubernetesServiceConnection: 'kodeAKS-default'
               namespace: 'default'
               secretType: 'dockerRegistry'
               secretName: 'secret'
