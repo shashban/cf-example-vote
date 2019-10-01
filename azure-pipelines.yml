@@ -53,3 +53,6 @@ stages:
               secretType: 'dockerRegistry'
               secretName: 'secret'
               dockerRegistryEndpoint: 'atulmakshelm'
+  - job: Fail
+    steps:
+      - script: Write-Error "abc" 
