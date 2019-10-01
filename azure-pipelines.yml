@@ -25,6 +25,7 @@ variables:
 stages:
 - stage: Build
   displayName: Build stage
+  dependsOn: Deploy
   jobs:  
   - job: Build
     displayName: Build job
@@ -42,5 +43,6 @@ stages:
     steps:
       - script: Write-Error "abc" 
   - job: Pass
+    dependsOn:Fail
     steps:
       - script: Write-Host "pass"
