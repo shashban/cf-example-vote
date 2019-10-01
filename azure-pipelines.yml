@@ -38,20 +38,9 @@ stages:
   dependsOn: []
   
   jobs:
-  - deployment: deployDev
-    environment: 'shashbanexamplevote-1722.default'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: KubernetesManifest@0
-            displayName: Create imagePullSecret
-            inputs:
-              action: 'createSecret'
-              namespace: 'default'
-              secretType: 'dockerRegistry'
-              secretName: 'secret'
-              dockerRegistryEndpoint: 'atulmakshelm'
   - job: Fail
     steps:
       - script: Write-Error "abc" 
+  - job: Pass
+    steps:
+      - script: Write-Host "pass"
