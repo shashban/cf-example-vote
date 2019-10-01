@@ -43,6 +43,5 @@ stages:
     steps:
       - script: Write-Error "abc" 
   - job: Pass
-    dependsOn:Fail
     steps:
-      - script: Write-Host "pass"
+      - script: echo "pass"
