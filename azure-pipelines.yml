@@ -39,7 +39,7 @@ stages:
   
   jobs:
   - deployment: deployDev
-    environment: 'shashbanexamplevote-1722'
+    environment: 'shashbanexamplevote-1722.default'
     strategy:
       runOnce:
         deploy:
@@ -48,7 +48,6 @@ stages:
             displayName: Create imagePullSecret
             inputs:
               action: 'createSecret'
-              kubernetesServiceConnection: '$(kubeconn)'
               namespace: 'default'
               secretType: 'dockerRegistry'
               secretName: 'secret'
