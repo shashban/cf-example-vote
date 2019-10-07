@@ -25,7 +25,7 @@ variables:
 stages:
 - stage: Build
   displayName: Build stage
-  dependsOn: Deploy
+  
   jobs:  
   - job: Build
     displayName: Build job
