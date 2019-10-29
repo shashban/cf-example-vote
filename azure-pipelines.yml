@@ -25,7 +25,8 @@ variables:
 stages:
 - stage: Build
   displayName: Build stage
-  
+  dependsOn: []
+  condition: and(succeeded(), startsWith(variables['BuildBranch'], 'Build'))
   jobs:  
   - job: Build
     displayName: Build job
@@ -36,9 +37,9 @@ stages:
 
 - stage: Deploy
   displayName: Deploy stage
-  dependsOn: Build
-  condition: failed()
-  
+  dependsOn: []
+  condition: and(succeeded(), not(startsWith(variables['BuildBranch'], 'Build')))
+    
   jobs:
   - job: Fail
     steps:
@@ -50,7 +51,7 @@ stages:
 - stage: Deploy2
   displayName: Deploy2 stage
   dependsOn: Deploy
-
+  
   jobs:
   - deployment: Deploy
     condition: succeeded()
