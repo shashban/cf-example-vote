@@ -51,7 +51,7 @@ stages:
 - stage: Deploy2
   displayName: Deploy2 stage
   dependsOn: Deploy
-  
+  condition: always()
   jobs:
   - deployment: Deploy
     condition: succeeded()
