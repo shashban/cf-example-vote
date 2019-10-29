@@ -46,3 +46,19 @@ stages:
   - job: Pass
     steps:
       - script: echo "pass"
+
+- stage: Deploy2
+  displayName: Deploy2 stage
+  dependsOn: Deploy
+
+  jobs:
+  - deployment: Deploy
+    condition: succeeded()
+    displayName: Deploy
+    
+    environment: 'shashbanexamplevote'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo "clean"
